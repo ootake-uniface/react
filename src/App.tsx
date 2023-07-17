@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { createContext, useState, useContext, useEffect } from "react";
+import ExampleComponent from "./components/common/ExampleComponent";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./pages/Home/index";
+import Foo from "./pages/Foo/index";
+import Bar from "./pages/Bar/index";
 
-function App() {
-  const [count, setCount] = useState(0)
+// store
+const storeData = {
+  message: "Hello World",
+};
+const SampleContext = createContext({});
 
+// route
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/foo",
+    element: <Foo />,
+  },
+  {
+    path: "/bar",
+    element: <Bar />,
+  },
+]);
+
+const App: React.FC = () => {
+  const [text, setText] = useState("ExampleComponent");
+  const [context, setContext] = useState(storeData);
+  console.log(context.message);
+  useEffect(() => {
+    setContext({ message: "state updated" });
+  }, []);
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <SampleContext.Provider value={{ context, setContext }}>
+        /** ヘッダーにする予定のコンポーネント */
+        <ExampleComponent message={text} />
+        <RouterProvider router={router} />
+      </SampleContext.Provider>
     </>
-  )
+  );
+};
+
+export function useSampleContext() {
+  return useContext(SampleContext);
 }
 
-export default App
+export default App;
